@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# pts - start/stop/restart pts
+#
+# Copyright 2002 DEQ <deq@oct.zaq.ne.jp>
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License.
+
+# Edit the following paths
+BINDIR=/home/tetrinet/pts
+EXECUTE=./pts.pl
+PIDFILE=/home/tetrinet/pts/pts.pid
+
+case "$1" in
+  start)
+    echo "Starting Perl TetriNET Server."
+    cd $BINDIR
+    $EXECUTE
+    ;;
+  stop)
+    echo "Stopping Perl TetriNET Server."
+    if [ -f $PIDFILE ]; then
+      pid=`cat $PIDFILE`
+      kill -INT $pid
+    else
+      echo "pid file not found!"
+    fi
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+
+exit 0

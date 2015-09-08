@@ -1,0 +1,77 @@
+--- pts-0.20b/pts.pl	Fri Aug 16 01:20:34 2002
++++ pts-0.20c/pts.pl	Sun Jan 26 14:34:30 2003
+@@ -1573,7 +1573,7 @@
+         csadded => $Users{$user}{gs}{csadded},
+         lifetime => GameTime($ch),
+         lines => $Users{$user}{gs}{lines},
+-        pieces => $Users{$user}{gs}{pieces},
++        pieces => $Users{$user}{gs}{pieces} - scalar @{$Users{$s}{gs}{sbgiven}},
+         specials => $Users{$user}{gs}{specials},
+         tetris => $Users{$user}{gs}{tetris},
+         ud => '-', # $Users{$user}{gs}{ud},
+@@ -3043,6 +3043,8 @@
+   my ($ch, $stopped) = @_;
+   return unless $ch->{ingame};
+ 
++  SetGameTimeEnd($ch);
++
+   $ch->{ingame} = 0;
+   $ch->{paused} = 0;
+   RemoveSuddenDeath($ch);
+@@ -3086,10 +3088,9 @@
+   }
+   my $numalive = scalar(keys %alive); # the number of alive teams (players)
+ 
+-  if ( $numalive == 0 # a one-player game or self-survival game has been ended
++  if ( $numalive == 0 # this condition means a one-player game or self-survival game has been ended
+        or ($numalive == 1 and @{$ch->{game}{start}} > 1 and $ch->{game}{gametype} != 2) ) {
+-    SetGameTimeEnd($ch);
+-
++  # game has been ended
+     my $wplayers = (values %alive)[0]; # winner players
+     if (defined $wplayers) {
+       AddPlayerGameInfo($ch, $_) foreach (@$wplayers);
+@@ -3546,6 +3547,7 @@
+ 
+ sub SetGameTimeEnd {
+   my ($ch) = @_;
++  return undef if defined $ch->{game}{timeend};
+   $ch->{game}{timeend} = RealTime();
+ }
+ 
+@@ -4140,19 +4142,24 @@
+ sub IsCertifyingClient {
+   my ($s) = @_;
+ 
+-  return ($Users{$s}{checking}[0] ? 1 : undef);
++  return (defined $Users{$s}{checking}[0] ? 1 : undef);
+ }
+ 
+ sub StartCertifyClient {
+   my ($s) = @_;
+ 
+-  $Users{$s}{checking}[0] = 1;
++  # authority level is once set to the lowest level;
++  # so not certified client cannot gain his real level until he is certified
++  $Users{$s}{checking}[0] = $Users{$s}{profile}[PF_PAUTHORITY];
++  $Users{$s}{profile}[PF_PAUTHORITY] = 0;
+   Send($s, 'pline', 0, [Msg('RegisteredNickEnterPassword')]);
+ }
+ 
+ sub EndCertifyClient {
+   my ($s) = @_;
+ 
++  # the user's real authority level is set back
++  $Users{$s}{profile}[PF_PAUTHORITY] = $Users{$s}{checking}[0];
+   $Users{$s}{checking}[0] = undef;
+   Send($s, 'pline', 0, [Msg('Certified')]);
+ 
+@@ -4167,7 +4174,7 @@
+ sub IsVerifyingClient {
+   my ($s) = @_;
+ 
+-  return ($Users{$s}{checking}[1] ? 1 : undef);
++  return (defined $Users{$s}{checking}[1] ? 1 : undef);
+ }
+ 
+ sub StartVerifyClient {

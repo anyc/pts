@@ -5,15 +5,19 @@ Note: many things in the lists are written in Japanese which is the author's nat
 あるチャンネルに入ったと同時にそのチャンネルの人が移動した場合 left メッセージが表示されずに，本当はいないのにいるように表示される
 player joins -> too many lmsg -> disconnects (after receiving others' `team' data in the happened case) -> no lmsg left (all lmsg deleted already and never shown)
 /gstats playing time when game is paused (pause 中の /gstats で lifetime が内部処理もろみえ...)
+GetMsg で展開された中にまた %0 などがあれば，次に i-1 したときに展開される
 
 [ToDo]
 game events (ex. conditions to end game, sudden death, etc.)
 player stats command - 04:20 <PAcK> shows winning percent..highest speed...average speed..games won...games played
+misc stats to file (such as open channels, how many players are logged in, etc)
 logging system ( Game?(winner, gstats, and...) )
+kind of: top 5 winners shown on connecting, or weekly one
 registering-required ban ? (by talence)
 ファイルを複数に分割... ＆プログラムファイルのロード？ (モジュール化？)
+tetrinet client perl module を正式にドキュメントつけて公開する？
 
-email adress to profile... when a player registerd, send password or something to the address? (an option)
+email adress to profile... (when a player registerd, send password or something to the address? (an option))
 
 Player Profile
 Registered Team (and enhancing regd nick)
@@ -28,6 +32,13 @@ report - trace only particular nick/host...
 trace... a part of report system
 各 Users のデータに TraceFlag みたいなの作る？ @Trace と... @Trace を変更したら各プレイヤーの TraceFlag も更新(再構築)？
 .ini に書くと permanent... /trace コマンドは temporary...
+
+password protected channel? (/join #ch pass)
+
+*** tetrinet.org ***
+<DEQ> /join 27
+<Server> Access denied. Invalid channel password.
+<Server> Usage: /join <#channel|channel number> [channel password]
 
 [Report]
 
@@ -45,8 +56,13 @@ irc support
 MultipleNumeriousTarget() ? (/msg NUMS, /kick NUMS, /file filename NUMS)
 /msg ALL (/cmsg nick を作って) とか /file filename ALL (/broadcast は /msg ALL の alias) SendToAll=authority オプション？
 broadcast メッセージはメッセージの前に Broadcast message from %0 みたいに
+broadcast message to a channel?
+
+downstack.com の /lmsg /notes のほうがいいかな
 
 /msgto - および /topic - で消去？ (/topic - はすでにできるなぁ)
+
+/kill などで channel slot 指定... nick じゃ指定できない人がいる
 
 /chstats (extended version of `/who ch'?)
 /who や /winlist などにも AnnounceStats や /list 系の整形アルゴリズムを？
@@ -55,8 +71,11 @@ broadcast メッセージはメッセージの前に Broadcast message from %0 みたいに
 pack: /olist, /dns
 A.J: an indicator beside a person's name that shows if they are registered or not when you /who.
 
-/ignore, /silence, /ろっく
+/ignore, /silence, /lock
 /ghost
+
+/lmsg to channel (or channel owner) (tetrinet.org)
+好きなように作れる /board ？
 
 /lmsg - 送れるメッセージ数の制限？
 /move 誰がコマンド発行したか
@@ -94,6 +113,8 @@ Impossible level update
 reference.html
 explanation of query (irc bots check)
 pts profile system (many names for a account tree; do not make alias loop)
+how to contact me
+今までのメールや掲示板のやりとりを FAQ にして公開？
 
 [ToDo2] (low priority or just thinking)
 password protected channel

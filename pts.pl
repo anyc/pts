@@ -65,6 +65,7 @@ use constant SHUTDOWNWAITTIME => 10; # shut down wait time
 use constant STARTINGCOUNTINTERVAL => 1; # starting count interval (seconds)
 
 # network
+use constant BIND => undef; # IP address to bind
 use constant LISTENQUEUESIZE => SOMAXCONN; # listen queue size
 use constant PROTOCOLVERSION => '1.13'; # version of the tetrinet protocol
 use constant RCHUNKSIZE => 1024; # chunk size reading from socket
@@ -324,7 +325,8 @@ sub CloseSocket {
   delete $Misc{clients}{$s};
   $Misc{readable}->remove($s);
   $Misc{writable}->remove($s);
-  $s->close();
+  # hmm, I don't know why undef value is passed to this function
+  $s->close() if defined $s;
   undef $s;
 }
 
@@ -580,6 +582,8 @@ sub OnPline {
   if ( IsCertifyingClient($s) ) {
     my $pass = StripColors($message);
     my $crypted = $Users{$s}{profile}[PF_PPASSWORD];
+
+    SetBackAuthority($s);
     if ( CheckPassword($pass, $crypted) ) {
       EndCertifyClient($s);
     } else {
@@ -1571,7 +1575,7 @@ sub OnPlGstats {
         csadded => $Users{$user}{gs}{csadded},
         lifetime => GameTime($ch),
         lines => $Users{$user}{gs}{lines},
-        pieces => $Users{$user}{gs}{pieces},
+        pieces => $Users{$user}{gs}{pieces} - scalar @{$Users{$s}{gs}{sbgiven}},
         specials => $Users{$user}{gs}{specials},
         tetris => $Users{$user}{gs}{tetris},
         ud => '-', # $Users{$user}{gs}{ud},
@@ -1659,7 +1663,7 @@ sub SendHelpList {
       my ($acmd, $aargs) = split(/ +/, $aliases->{$alias}, 2);
       push(@commands, [$acmd, $alias]) if (defined $acmd and $acmd ne '');
     }
-    @commands = sort @commands;
+    @commands = sort {$a->[1] cmp $b->[1]} @commands;
   } else {
     my $authmod = $Config->val('Authority', 'Moderator');
     foreach ( @{$Misc{command_names}} ) {
@@ -2165,6 +2169,7 @@ sub OnPlMsgto {
   my ($cmd, $target) = split(/ +/, $msg);
 
   if (defined $target) {
+    $target = '' if $target eq '-';
     $Users{$s}{msgto} = $target;
     if ($target ne '') {
       Send($s, 'pline', 0, [Msg('SetMsgto', $target)]);
@@ -3040,6 +3045,8 @@ sub EndGame {
   my ($ch, $stopped) = @_;
   return unless $ch->{ingame};
 
+  SetGameTimeEnd($ch);
+
   $ch->{ingame} = 0;
   $ch->{paused} = 0;
   RemoveSuddenDeath($ch);
@@ -3083,10 +3090,9 @@ sub CheckGameEnd {
   }
   my $numalive = scalar(keys %alive); # the number of alive teams (players)
 
-  if ( $numalive == 0 # a one-player game or self-survival game has been ended
+  if ( $numalive == 0 # this condition means a one-player game or self-survival game has been ended
        or ($numalive == 1 and @{$ch->{game}{start}} > 1 and $ch->{game}{gametype} != 2) ) {
-    SetGameTimeEnd($ch);
-
+  # game has been ended
     my $wplayers = (values %alive)[0]; # winner players
     if (defined $wplayers) {
       AddPlayerGameInfo($ch, $_) foreach (@$wplayers);
@@ -3543,6 +3549,7 @@ sub ResetGameTime {
 
 sub SetGameTimeEnd {
   my ($ch) = @_;
+  return undef if defined $ch->{game}{timeend};
   $ch->{game}{timeend} = RealTime();
 }
 
@@ -4137,13 +4144,16 @@ sub EndCheckingClient {
 sub IsCertifyingClient {
   my ($s) = @_;
 
-  return ($Users{$s}{checking}[0] ? 1 : undef);
+  return (defined $Users{$s}{checking}[0] ? 1 : undef);
 }
 
 sub StartCertifyClient {
   my ($s) = @_;
 
-  $Users{$s}{checking}[0] = 1;
+  # authority level is once set to the lowest level;
+  # so not certified client cannot gain his real level until he is certified
+  $Users{$s}{checking}[0] = $Users{$s}{profile}[PF_PAUTHORITY];
+  $Users{$s}{profile}[PF_PAUTHORITY] = 0;
   Send($s, 'pline', 0, [Msg('RegisteredNickEnterPassword')]);
 }
 
@@ -4161,10 +4171,17 @@ sub EndCertifyClient {
   EndCheckingClient($s) unless IsCheckingClient($s);
 }
 
+sub SetBackAuthority {
+  my ($s) = @_;
+
+  # the user's real authority level is set back
+  $Users{$s}{profile}[PF_PAUTHORITY] = $Users{$s}{checking}[0];
+}
+
 sub IsVerifyingClient {
   my ($s) = @_;
 
-  return ($Users{$s}{checking}[1] ? 1 : undef);
+  return (defined $Users{$s}{checking}[1] ? 1 : undef);
 }
 
 sub StartVerifyClient {
@@ -5242,6 +5259,7 @@ sub StartServer {
   $Misc{listener}{tetrinet} = IO::Socket::INET->new(
     LocalPort => TNETPORT,
     Listen => LISTENQUEUESIZE,
+    LocalAddr => BIND,
     Proto => 'tcp',
     Reuse => 1,
   ) or (
@@ -5256,6 +5274,7 @@ sub StartServer {
     $Misc{listener}{lookup} = IO::Socket::INET->new(
       LocalPort => LOOKUPPORT,
       Listen => LISTENQUEUESIZE,
+      LocalAddr => BIND,
       Proto => 'tcp',
       Reuse => 1,
     ) or (
@@ -5599,6 +5618,7 @@ sub ReadMsg {
     ExplainMove2 => '<blue>0<blue> compacts numbers, <blue>8<blue> shuffles numbers',
     ExplainMsg => 'Sends a private message to player(s)',
     ExplainMsgto => 'Sets a player to send /msg to',
+    ExplainMsgto2 => '<blue>-<blue> sets back to default',
     ExplainNews => 'Displays news',
     ExplainPasswd => 'Changes your password',
     ExplainPause => 'Pauses/Unpauses current game',

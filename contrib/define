@@ -1,0 +1,89 @@
+Contributed by Dylan William Hardison <dylan@hardison.net>
+
+
+Description
+===========
+
+This /define command defines a new command dynamically without restart.
+For example, create a file subs/say.sub and the content is:
+
+sub {
+    my ($s, $msg, $page) = @_;
+    my ($cmd, $message) = split(/ +/, $msg, 2);
+    my $ch = $Users{$s}{channel};
+
+    if ($message ne '') {
+        SendToChannel($ch, 0, 'pline', 0, [Msg(ucfirst($cmd), "$message")])
+    } else {
+        Send($s, 'pline', 0, [Msg('Format'), Msg('Format'.ucfirst($cmd), Msg('ColorCommandUsable'))]);
+    }
+}
+
+Then edit the pts.ini and set [Command] Say to the authority you want to set.
+So "/define say" from tetrinet client makes the new command /say.
+
+
+Code
+====
+
+sub OnPlDefine {
+  my ($s, $msg, $page) = @_;
+  my ($cmd, $sub, $force) = split(/ +/, $msg, 3);
+
+  my $file = $sub;
+  unless (defined $sub) {
+    Send($s, 'pline', 0, [Msg('Format'), Msg('FormatDefine', Msg('ColorCommandUsable'))]);
+
+  }
+  if ($file =~ /(\w+)/) {
+    $file = $1;
+  }
+  $file.='.sub';
+  if (-e "subs/$file") {
+    my $code=do "./subs/$file";
+
+    if ($code == undef) {
+    my @errors=split(/\n/,$@);
+      foreach (@errors) {
+        Send($s, 'pline', 0, [Msg('DefinePerlError', $_)]);
+      }
+    }
+
+    if (ref($code) eq "CODE") {
+      $Misc{commands}->{$sub}=$code;
+        $Misc{command_names} = [sort keys %{$Misc{commands}}];
+      Send($s, 'pline', 0, [Msg('Defined', $sub, $file)]);
+    } else {
+      Send($s, 'pline', 0, [Msg('DefineNotCode', $file)]);
+    }
+  } else {
+    Send($s, 'pline', 0, [Msg('DefineNoFile', $file)]);
+  }
+}
+
+sub OnPlUndefine {
+  my ($s, $msg, $page) = @_;
+  my ($cmd, $sub) = split(/ +/, $msg, 2);
+
+  if ($sub) {
+    delete $Misc{commands}->{$sub};
+      $Misc{command_names} = [sort keys %{$Misc{commands}}];
+    Send($s, 'pline', 0, [Msg('Undefined', $sub)]);
+  } else {
+    Send($s, 'pline', 0, [Msg('Format'), Msg('FormatUndefine', Msg('ColorCommandUsable'))]);
+  }
+}
+
+
+Messages
+========
+
+FormatDefine=%0/define <blue><command>.
+FormatUndefine=%0/undefine <blue><sub>.
+
+DefineNotCode=<red>%0 does not return a coderef!
+Defined=<blue>Defined %0
+DefinePerlError=<red>Perl Error: <dblue>%0
+DefineNoFile=<red>The file <bold>%0<bold>, does not exist
+DefinedAlready=<gray>%0 is already defined.
+Undefined=<blue>Undefined /%0

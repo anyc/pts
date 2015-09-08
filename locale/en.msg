@@ -98,6 +98,7 @@ ExplainMove=Moves a player to a new player number
 ExplainMove2=<blue>0<blue> compacts numbers, <blue>8<blue> shuffles numbers
 ExplainMsg=Sends a private message to player(s)
 ExplainMsgto=Sets a player to send /msg to
+ExplainMsgto2=<blue>-<blue> sets back to default
 ExplainNews=Displays news
 ExplainPasswd=Changes your password
 ExplainPause=Pauses/Unpauses current game

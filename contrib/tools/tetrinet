@@ -1,0 +1,71 @@
+#!/bin/bash
+# chkconfig: 235 99 00
+# description: Start or stop the TetriNET Server
+# Author: Rodigo Bustos L. rbustos@cyberufo.cl
+
+# Path to the httpd binary.
+src=/usr/local/TetriNET
+prog=tetrinet
+RETVAL=0
+
+start() {
+	cd $src
+	sh tetrinet.sh
+	if [ -s "$src"/pts.pid ]; then
+	pid=`cat $src/pts.pid`
+	  echo "$prog is running OK"
+	  echo "Process number : ($pid)"
+	else
+	  echo "$prog FAILED"
+	fi
+	RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && touch /var/lock/subsys/$prog
+        return $RETVAL
+}
+
+stop() {
+        if [ -s "$src"/pts.pid ]; then
+        pid=`cat $src/pts.pid`
+        kill -INT $pid >/dev/null 2>&1
+        echo -n "Stopping $prog: OK"
+	else
+	echo -n "Stopping FAILED"
+	fi
+	RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && rm -f /var/lock/subsys/$prog $src/pts.pid
+}
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        if [ -s "$src"/pts.pid ]; then
+                pid=`cat $src/pts.pid`
+                kill -0 $pid >/dev/null 2>&1
+                if [ "$?" = "0" ]; then
+                        echo "TetriNET Server (pid $pid) is running"
+                else
+                        echo "TetriNET is stopped"
+                fi
+        else
+                echo "TetriNET is stopped"
+        fi
+        ;;
+
+  restart)
+        stop
+        start
+        ;;
+*)
+        echo $"Usage: $prog {start|stop|restart|status}"
+        exit 1
+esac
+
+exit $RETVAL

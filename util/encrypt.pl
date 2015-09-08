@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 # encrypt.pl - encrypts your password for writing pts.secure
 # You need to run this program on the same machine you want to run pts.pl.

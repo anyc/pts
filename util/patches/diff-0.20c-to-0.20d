@@ -1,0 +1,34 @@
+--- ./pts-0.20c/pts.pl	2003-01-21 01:41:56.000000000 +0900
++++ ./pts-0.20d/pts.pl	2003-01-29 20:06:22.000000000 +0900
+@@ -582,6 +582,8 @@
+   if ( IsCertifyingClient($s) ) {
+     my $pass = StripColors($message);
+     my $crypted = $Users{$s}{profile}[PF_PPASSWORD];
++
++    SetBackAuthority($s);
+     if ( CheckPassword($pass, $crypted) ) {
+       EndCertifyClient($s);
+     } else {
+@@ -4158,8 +4160,6 @@
+ sub EndCertifyClient {
+   my ($s) = @_;
+ 
+-  # the user's real authority level is set back
+-  $Users{$s}{profile}[PF_PAUTHORITY] = $Users{$s}{checking}[0];
+   $Users{$s}{checking}[0] = undef;
+   Send($s, 'pline', 0, [Msg('Certified')]);
+ 
+@@ -4171,6 +4171,13 @@
+   EndCheckingClient($s) unless IsCheckingClient($s);
+ }
+ 
++sub SetBackAuthority {
++  my ($s) = @_;
++
++  # the user's real authority level is set back
++  $Users{$s}{profile}[PF_PAUTHORITY] = $Users{$s}{checking}[0];
++}
++
+ sub IsVerifyingClient {
+   my ($s) = @_;
+ 

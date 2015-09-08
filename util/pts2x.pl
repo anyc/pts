@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 # pts2x.pl - converts pts winlist to tetrix format
 #

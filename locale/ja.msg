@@ -98,6 +98,7 @@ ExplainMove=プレイヤー番号を変更
 ExplainMove2=<blue>0<blue> で詰める，<blue>8<blue> でシャッフル
 ExplainMsg=指定プレイヤーにプライベートメッセージを送信
 ExplainMsgto=/msgを送信するプレイヤーを設定
+ExplainMsgto2=<blue>-<blue> はデフォルトに戻す
 ExplainNews=ニュースを表示
 ExplainPasswd=パスワードの変更
 ExplainPause=現在行われているゲームを一時停止/再開

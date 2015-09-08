@@ -1,5 +1,23 @@
 Revision history for Perl TetriNET Server.
 
+0.21  CURRENTLY WORKING
+    - Fixed bug where user connected and gave wrong password, the
+      authority of the nick's profile was not kept and set to 0.
+    - Fixed bug where users could have gained high authority level and
+      got report messages when they had not done certifying yet.
+    - Fixed bug where the time the game lasted, displayed on the game
+      statistics, was incorrect when the game was stopped.
+    - The ppm value during the game is now almost accurate, as same as
+      the value after the game. Earlier version was inaccurate when it
+      is during the game and there is UD value for the player.
+    - Added contrib/define file which gives you a neat command /define.
+    - Added BIND option. Set it when you have 2 or more IP adresses on
+      1 machine and want to bind the server to 1 IP address.
+    - Added contrib directory which contains contributed files. Added
+      util/pts shell script.
+    - Fixed bug where `/help -l' command list was not sorted.
+    - Some minor changes/bugfix.
+
 0.20  Tue May 28 23:13:03 JST 2002
     - Added ability to detect cheat programs such as TClone. If you
       turn on VerifyClient, there will be a verification test for every
