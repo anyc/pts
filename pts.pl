@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 # =================================================================
 #   Perl TetriNET Server v0.20
@@ -13,7 +13,7 @@
 #
 # -----------------------------------------------------------------
 
-use constant VERSION => '0.20';
+use constant VERSION => '0.20 (mod_anyc)';
 use constant DEBUG => 0;
 
 use Config::IniFiles;
@@ -24,19 +24,19 @@ use POSIX qw();
 use strict;
 
 # path
-use constant BANFILE => "./pts.ban"; # ban list file
+use constant BANFILE => "pts.ban"; # ban list file
 use constant BACKUPSUFFIX => ".old"; # winlist old data file suffix
-use constant CONFIGFILE => "./pts.ini"; # config file
-use constant DAILYFILE => "./dstats/%y%m.log"; # daily stats file (%y = year, %m = month, %d = month day)
-use constant LMSGFILE => "./pts.lmsg"; # left message file
-use constant LOGFILE => "./logs/%y%m.log"; # log file (%y = year, %m = month, %d = month day)
-use constant PIDFILE => "./pts.pid"; # pid file
-use constant PROFILEFILE => "./pts.profile"; # profile file
+use constant CONFIGFILE => "pts.ini"; # config file
+use constant DAILYFILE => "/var/games/pts/dstats/%y-%m-%d.log"; # daily stats file (%y = year, %m = month, %d = month day)
+use constant LMSGFILE => "pts.lmsg"; # left message file
+use constant LOGFILE => "/var/games/pts/logs/%y-%m-%d.log"; # log file (%y = year, %m = month, %d = month day)
+use constant PIDFILE => "/var/run/pts.pid"; # pid file
+use constant PROFILEFILE => "pts.profile"; # profile file
 use constant RELAUNCH => "perl $PROGRAM_NAME"; # shell command to re-launch the server
-use constant SECUREFILE => "./pts.secure"; # secure (password) file
+use constant SECUREFILE => "pts.secure"; # secure (password) file
 
 # system
-use constant DAEMON => 0; # run as daemon (fork() should be available)
+use constant DAEMON => 1; # run as daemon (fork() should be available)
                           # windows perl user should set this off
 use constant NOFORK => 0; # no using fork()
                           # fork() doesn't work on some operating systems
@@ -66,14 +66,15 @@ use constant STARTINGCOUNTINTERVAL => 1; # starting count interval (seconds)
 
 # network
 use constant LISTENQUEUESIZE => SOMAXCONN; # listen queue size
-use constant PROTOCOLVERSION => '1.13'; # version of the tetrinet protocol
+use constant PROTOCOLVERSION1 => '1.13'; # version of the tetrinet protocol
+use constant PROTOCOLVERSION2 => '1.14'; # version of the tetrinet protocol
 use constant RCHUNKSIZE => 1024; # chunk size reading from socket
 use constant SELECTINTERVAL => 0.1; # select() interval
 use constant TERMINATOR => "\xFF"; # message terminator of the tetrinet protocol
 use constant QUERYTERMINATOR => "\x0A";
 use constant TNETPORT => 31457; # port for tetrinet client
 use constant WCHUNKSIZE => 512; # chunk size writing to socket
-use constant LOCALHOST => '127.0.0.1'; # 'localhost' or '127.0.0.1' (IPv4)
+use constant LOCALHOST => 'localhost'; # 'localhost' or '127.0.0.1' (IPv4)
 
 # DNS lookup
 use constant LOOKUPHOST => 1; # lookup host name or not
@@ -91,6 +92,7 @@ use constant CONNECTION_TETRINET => 'tetrinet';
 use constant CONNECTION_LOOKUP => 'lookup';
 use constant CLIENT_TETRINET => 'tetrinet';
 use constant CLIENT_TETRIFAST => 'tetrifast';
+#use constant CLIENT_TETRINET1_14 => 'tetrinet1_14';
 use constant CLIENT_QUERY => 'query';
 use constant HELLOMSG_TETRINET => 'tetrisstart';
 use constant HELLOMSG_TETRIFAST => 'tetrifaster';
@@ -479,8 +481,8 @@ sub OnTetrisstart {
   $Users{$s}{nick} = $nick;
 
   # checks protocol version
-  if ($version ne PROTOCOLVERSION) {
-    Send($s, 'noconnecting', [Msg('VersionDifference', $version, PROTOCOLVERSION)]);
+  if (($version ne PROTOCOLVERSION1) and ($version ne PROTOCOLVERSION2)) {
+    Send($s, 'noconnecting', [Msg('VersionDifference', $version, PROTOCOLVERSION1." ".PROTOCOLVERSION2)]);
     Report('connection_error', $s, $s, RMsgDisconnect("Unknown tetrinet client version ($version)", $s));
     CloseConnection($s);
     return;
@@ -2933,8 +2935,10 @@ sub StartGame {
     my @names = split(/ +/, lc $Config->val('Main', 'SpecTeamName'));
     if ( $team ne '' and grep {$_ eq $lcteam} @names ) {
       push(@spectators, $user);
-    } elsif ( ($ch->{tetrinet} and $Users{$user}{client} eq CLIENT_TETRINET)
-        or ($ch->{tetrifast} and $Users{$user}{client} eq CLIENT_TETRIFAST) ) {
+    } elsif (
+           ($ch->{tetrinet}  and $Users{$user}{client} eq CLIENT_TETRINET  and ($ch->{equality} xor ($Users{$user}{version} eq '1.13')) )
+        or ($ch->{tetrifast} and $Users{$user}{client} eq CLIENT_TETRIFAST and ($ch->{equality} xor ($Users{$user}{version} eq '1.13')) ) 
+            ) {
       push(@start, [$user, $Users{$user}{nick}, $team]);
     } else {
       push(@spectators, $user);
@@ -2982,6 +2986,31 @@ sub StartGame {
     SendToChannel($ch, $slot, 'playerleave', $slot);
   }
 
+  # send field
+  my $field;
+  my @fields;
+  open(FIELD, $ch->{fieldfile});
+  @fields = <FIELD>;
+  $field = join('',@fields);
+
+  my $seed;
+  my $i;
+  my $char;
+  $seed = "";
+  if ($ch->{equality})   {
+   for ($i=0;$i < 8; $i++) {
+    $char = round(rand(16));
+    if ($char eq 10) {$char = 'a';}
+    if ($char eq 11) {$char = 'b';}
+    if ($char eq 12) {$char = 'c';}
+    if ($char eq 13) {$char = 'd';}
+    if ($char eq 14) {$char = 'e';}
+    if ($char eq 15) {$char = 'f';}
+
+    $seed = $seed.$char;
+   }
+  }
+
   # send newgame
   my @stack = split(/\s+/, $ch->{stack});
   foreach (@start) {
@@ -2992,8 +3021,10 @@ sub StartGame {
         $ch->{startinglevel}, $ch->{linesperlevel}, $ch->{levelincrease},
         $ch->{linesperspecial}, $ch->{specialadded}, $ch->{specialcapacity},
         $blocks, $specials,
-        $ch->{averagelevels}, $ch->{classicrules}
+        $ch->{averagelevels}, $ch->{classicrules}, $seed
     );
+
+    Send($user, 'f', $slot, $field);
   }
 
   foreach my $user (@spectators) {
@@ -5478,6 +5509,8 @@ sub ReadConfig {
     '[ChannelDefault] SpecialGravity' => 6,
     '[ChannelDefault] SpecialQuakefield' => 14,
     '[ChannelDefault] SpecialBlockbomb' => 14,
+    '[ChannelDefault] FieldFile' => '',
+    '[ChannelDefault] Equality' => '',
   );
 
   foreach my $key (keys %init) {
@@ -5952,6 +5985,8 @@ sub InitialChannelData {
     specialgravity => $Config->val('ChannelDefault', 'SpecialGravity'),
     specialquakefield => $Config->val('ChannelDefault', 'SpecialQuakefield'),
     specialblockbomb => $Config->val('ChannelDefault', 'SpecialBlockbomb'),
+    fieldfile => $Config->val('ChannelDefault', 'FieldFile'),
+    equality => $Config->val('ChannelDefault', 'Equality'),
   );
 }
 
