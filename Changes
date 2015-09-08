@@ -1,0 +1,293 @@
+Revision history for Perl TetriNET Server.
+
+0.20  Tue May 28 23:13:03 JST 2002
+    - Added ability to detect cheat programs such as TClone. If you
+      turn on VerifyClient, there will be a verification test for every
+      client on connecting. I have not tested GTetrinet client yet,
+      so if that client cannot connect this server, please let me know.
+    - The shebang line is now set to #!/usr/local/bin/perl as opposed
+      to #!/usr/bin/perl.
+    - Japanese system message file is no longer loaded in default.
+    - Added or changed some error messages on connecting.
+    - Banning of nickname now bans his/her profile nickname, not
+      his/her real nickname which is visible for players.
+    - Added /find command that searchs players on the server.
+    - Some minor changes/bugfix.
+
+0.19  Sun Mar 17 06:15:47 JST 2002
+    - Enhanced /help command. /helpop is now an alias for `help -o'.
+    - Changed form of Format* messages and added SendCommandFormat().
+    - /lmsg now leaves messages to specified nick's profile (nothing
+      effects if you don't have an alias).
+    - Added ability to unregister alias for /alias. Also it now reports.
+    - Users cannot use a same profile at the same time. They'll get a
+      `Nickname already exists on server!' error.
+    - Added [Main] ReservedName to config file. Users cannot use the
+      names for their nickname.
+    - Added report system which is enhanced old logging system. Renamed
+      [Log] section to [Report], also added/changed things related to
+      the new feature. Some messages has been changed.
+    - Fixed some bugs on the logging system, such as the server logged
+      that a user gained authority when he/she had failed to get it.
+    - Added ability to show average of ping time for /ping and /info.
+    - Some minor changes/bugfix.
+
+0.18  Sat Feb 23 16:33:28 JST 2002
+    - Includes some documents in the new directory `docs'.
+    - Added [Main] AntiFlood, MessagePenalty and PenaltyPerSecond
+      options to config file. Removed ANTIFLOOD, MESSAGEPENALTY and
+      PENALTYPERSECOND options from pts.pl file.
+    - Fixed bug where MAXMESSAGELENGTH did not work.
+    - Changed code Time() to PTime(), and time() to Time().
+    - Added /shutdown -c option that cancels shutdown request.
+    - Enhanced /info command to show user's current session information
+      by default. Old profile information is available by /info2.
+    - Renamed [Command] WhoDisplayIP option to DisplayIP.
+    - Added /lang command that changes language of server messages for
+      each users. English (en) and Japanese (ja) are now supplied.
+    - Added [Locale] section to config file. Removed MSGFILE option
+      from pts.pl file.
+    - Code related to Send() and Msg() has been changed.
+    - Added directory `locale' which includes server message files.
+      Moved msg.en there with renaming to en.msg. Also added ja.msg.
+    - Added directory `util' which includes some extra programs. Moved
+      encrypt.pl there, also some new scripts have been added.
+    - Some minor changes/bugfix.
+
+0.17  Tue Feb 12 05:52:41 JST 2002
+    - Added /alias command that registers a real nickname for an alias
+      name.
+    - Added /dstats command that displays current daily statistics.
+    - Added a section name to secure and message files.
+    - Fixed bug where /unban didn't work at all.
+    - Fixed bug where /passwd didn't work at all.
+    - Fixed bug where players were sometimes treated as who cleared no
+      lines even if they had cleared some lines (not completely).
+    - Includes v2.27 of Config::IniFiles module as opposed to v2.19.
+    - Some minor changes/bugfix.
+
+0.16  Thu Dec 27 15:41:43 JST 2001
+    - Added /board command that accesses to the Message Board.
+    - Added /lmsg command that leaves a message.
+    - Added /passwd command that changes user's password.
+    - Enhanced /gstats command to be usable while game is in progress.
+    - Added [Channel*] GameStatsMsg option so that you can change
+      game stats message for each channels.
+    - Fixed bug where server miscounted number of cleared lines in pure.
+    - Added ability to show game stats in specials.
+    - Added function that treats players who have not cleared any lines
+      as player who has not played the game.
+    - Some minor changes/bugfix.
+
+0.15  Sat Dec  8 21:16:28 JST 2001
+    - Added player profile and registered nick feature (experimental).
+    - Changed authority system to 10 level from 3 level.
+    - Changed secure option names.
+    - Added /reg command that registers a nick with password.
+    - Added /unreg command that removes password from a registered nick.
+    - Added /grant command that gives authority for others.
+    - Added /info command that displays player information.
+    - Added /stop command that stops current game.
+    - Added /pause command that pauses/unpauses current game.
+    - Added /quit command that quits the server.
+    - Added [Authority] section to config file.
+    - Added [Command] Profile option.
+    - Fixed bug where server got down after ClockChanged() called.
+    - Some minor changes/bugfix.
+
+0.14  Sat Nov 24 19:56:59 JST 2001
+    - Added daily stats feature (experimental).
+    - Added -r option to ban format. If -r option is set, the following
+      masks will be treated as regular expressions.
+    - Added AUTOSAVE option.
+    - Added GMSGPAUSE and [Main] InterceptGmsgPause options.
+    - [Main] PingIntercept option has been renamed to InterceptGmsgPing.
+    - Fixed bug where users could not clear some settings by specifying
+      empty (`/topic ' and `/msgto '). This bug was introduced in the
+      previous version.
+    - Fixed bug where the server logged that users got op or owner
+      authority even if they actually had not gotten the authority.
+    - Some minor changes/bugfix.
+
+0.13  Wed Nov 14 07:30:04 JST 2001
+    - Added ability to run as daemon.
+    - Added function that writes the server's process id to pid file.
+    - Now players can be idle without sending messages.
+    - Added TIMEHIRES option that gets millisecond resolution time. You
+      need to install Time::HiRes perl module to use this feature.
+    - Added /time command that displays the server time.
+    - Enhanced /ping command to display network latency.
+    - Added [CommandAlias] section to config file.
+    - Added [Main] TimeoutPing. Removed [Main] TimeoutWarn.
+    - Some minor changes/bugfix.
+
+0.12  Tue Nov  6 19:37:35 JST 2001
+    - `;'s in nick/team will be displayed as `:' on the Win List screen.
+    - Changed ban file format.
+    - Changed /list display format.
+    - Added /teleport command that forces a player to join a channel.
+    - Added /file command that displays a message file.
+    - Added [Log] Admin, Auth, Join, Move and Set options.
+    - Fixed bug where some other player fields were shown as full of
+      blocks when you had joined a in-game channel (I think).
+    - Fixed bug where game time was counted even if the game was paused.
+    - Fixed bug where some color codes were not stripped.
+    - Fixed bug where players with colored name could not send game
+      messages if StripNameColor option was on.
+    - Fixed bug where players could connect to the server with empty
+      name if StripNameColor option was on.
+    - Some minor changes/bugfix.
+
+0.11  Sun Oct 21 16:43:55 JST 2001
+    - No longer depends on Games::Tetrinet module.
+    - Added feature to handle query access.
+    - Added /news command that displays news file.
+    - Enhanced /reset command to backup old winlist data file by
+      specifying -b option.
+    - Added [FilePath] section to config file.
+    - Added [Main] ClientTetrinet, ClientTetrifast, and ClientQuery
+      options.
+    - Added [Command] PageHelp, PageList, and PageWinlist (renamed from
+      WinlistPage) options.
+    - [Channel*] WelcomeMessage has no compatibility with under v0.10.
+    - Fixed bug where /kill banned user who killed not user who was
+      killed.
+    - Fixed bug where AnnounceRank didn't work if Winlist option was
+      not correctly set.
+    - Some minor changes/bugfix.
+
+0.10  Fri Sep 14 02:46:44 JST 2001
+    - Added feature to show game statistics after every games (limited
+      only to pure style games).
+    - Added support to play SelfSurvival game style.
+    - Added command alias function.
+    - Added /gstats command that displays game statistics.
+    - Added /reset command that clears winlist records.
+    - /adminhelp command has been renamed to /helpop.
+    - Added [Channel*] GameType option.
+    - Added [Channel*] AnnounceStats option.
+    - Added [Winlist*] Type option. The winlist system can rank by
+      number of cleared lines, by highest lifetime seconds and by
+      lowest lifetime seconds.
+    - [Channel*] AnnounceWinner option has been renamed to AnnounceRank.
+    - [Main] StripNickColor option has been renamed to StripNameColor.
+    - Fixed bug where ClassicRules and AverageLevels options didn't
+      work as their names represent.
+    - Fixed bug where team names were case sensitive on game.
+    - Changing channel settings no longer affects current games.
+    - Changed winlist file format.
+    - Some minor changes/bugfix.
+
+0.09  Sat Aug 18 20:11:02 JST 2001
+    - Added SCRIPTNAME constant instead of old $Misc{scriptname}.
+    - Fixed bug where zombie processes were not terminated.
+    - Added log options: Ban, Chat, Game, Msg, RawReceive, RawSend and
+      Team.
+    - Perl TetriNET Server is now distributed under the GNU GPL. See
+      the gpl.txt file for detail of the license.
+    - Some minor changes/bugfix.
+
+0.08  Wed Aug 15 18:25:17 JST 2001
+    - Added /shutdown command that halts the server.
+    - Added /kill command that does stealth kick and temporary ban.
+    - Added /load command that reloads config files.
+    - Added /save command that writes out config files to disk.
+    - Added /ban command that bans users.
+    - Added /unban command that lifts a ban mask.
+    - Added [Channel*] Setable option.
+    - PlayGame option has been renamed to Playable.
+    - Changed color tags form from %{nama} to <name>
+    - Fixed bug where points was only added to alive players.
+    - Included Config::IniFiles perl module in the distribution.
+    - Added expire ability to ban.
+    - Changed lookup algorithm.
+    - Some minor changes/bugfix.
+
+0.07  Mon Jul 30 09:55:05 JST 2001
+    - Enhanced /help command to explain a given command.
+    - Added /set command that changes channel configuration.
+    - Added UsersFromSameIP option that limits number of user
+      connections from the same ip address.
+    - Added LOOKUPHOST option that tries to lookup DNS and get
+      the connecting user's hostname.
+    - Added StripColors from log option.
+    - Added WhoDisplayIP option.
+    - Added anti-flood function.
+    - Added exception masks and nick masks functions for banning.
+    - Changed sending algorithm.
+    - Some minor changes/bugfix.
+
+0.06  Mon Jul 23 03:21:19 JST 2001
+    - Added `/start [count]' command that starts game in given count.
+    - Added `/ping' command that replies pong message.
+    - Added `/motd' command that displays the motd.
+    - Added `/version' command that displays the server's version.
+    - Added `/adminhelp' command that lists the server commands for
+      administrators.
+    - Added `/auth [<USER|OP|OWNER> [password]]' command that allows
+      users to change their own authority by valid password.
+    - Added `/broadcast <message>' command that sends a message to all.
+    - Improved command matching method to more flexible.
+    - Fixed bug where server got down by accept() failed (I think).
+    - Added feature to send welcome message for each channels.
+    - Fixed bug where active level didn't increase.
+    - Fixed bug where not empty channel was garbaged.
+    - Added encrypt.pl script in the distribution.
+    - Some minor changes/bugfix.
+
+0.05  Fri Jul 20 02:01:01 JST 2001
+    - Now `playerlost', `f', `sb' and `lvl' messages are not forwarded
+      to the others while out of game.
+    - Added feature to spectate by setting team name.
+    - /talk command place has been taken by /msg. Use `/msg nick' for
+      `/talk nick'. Also `/msg slot(s)' syntax is available.
+    - Renamed /talkto command to /msgto.
+    - Improved ban mask to be case insensitive.
+    - Fixed bug where no `endgame' was sent when player had joined a
+      channel while game is in play and the player is alive.
+    - Fixed bug where other player's fields weren't display when player
+      had joined a channel while game is in play.
+    - Fixed bug where server process got killed with `Broken pipe'
+      error (I think this is fixed).
+    - Some minor changes/bugfix.
+
+0.04  Sat Jul 14 23:56:28 JST 2001
+    - Fixed bug where `playerlost' messages was not forward to others.
+    - Fixed bug where players could join full channels that maxplayers
+      option is set less than 6.
+    - Made functions code in order.
+    - Added function that closes connection to user when server have
+      got too long message from the user.
+    - Enhanced /who command. It takes an optional parameter for list
+      players on a specified channel.
+    - Some minor changes/bugfix.
+
+0.03  Wed Jul 11 17:22:23 JST 2001
+    - Changed channel name color in the /list. Red for channels you are
+      now on, Deep-Blue for channels anyone is not allowed to play game,
+      Gray for channels your client is not allowed to play game, Blue
+      for other ordinary channels.
+    - Added /winlist [channel] [-page] command that displays current/
+      specified channel's winlist.
+    - Added /score [nickname|teamname] command that displays current
+      channel member/specified name's score.
+    - ServerAnnounce option moved to Channel* section from Main section.
+    - Fixed bug where points was added to wrong player/team.
+    - Added options [Channel*] AnnounceScore. ServerAnnounce has been
+      renamed to AnnounceWinner.
+    - Some minor changes/bugfix.
+
+0.02  Tue Jul 10 19:24:09 JST 2001
+    - Fixed bug where new player was always added to the end of winlist
+      and was not added to appropriate his/her rank.
+    - Changed winlist data structure and winlist settings format in
+      configuration file.
+    - Added [Winlist*] PlayerOnly option in configuration file.
+    - Fixed bug where players got disconnected when game had paused.
+    - Now `team' messages follows after `playerjoin' messages.
+    - Added subroutines CompactPlayers() and ShufflePlayers() that the
+      codes are separated from OnPlMove().
+    - Fixed some minor bugs.
+
+0.01  Mon Jul  9 21:50:00 JST 2001
+    - Released.

@@ -1,0 +1,269 @@
+Note: many things in the lists are written in Japanese which is the author's native language.
+
+[Bugs]
+複数プレイヤーが得点したとき AnnounceScore の Rank 表示がかみあわない場合が存在する (add points で rank が良いほうから順に処理？)
+あるチャンネルに入ったと同時にそのチャンネルの人が移動した場合 left メッセージが表示されずに，本当はいないのにいるように表示される
+player joins -> too many lmsg -> disconnects (after receiving others' `team' data in the happened case) -> no lmsg left (all lmsg deleted already and never shown)
+/gstats playing time when game is paused (pause 中の /gstats で lifetime が内部処理もろみえ...)
+
+[ToDo]
+game events (ex. conditions to end game, sudden death, etc.)
+player stats command - 04:20 <PAcK> shows winning percent..highest speed...average speed..games won...games played
+logging system ( Game?(winner, gstats, and...) )
+registering-required ban ? (by talence)
+ファイルを複数に分割... ＆プログラムファイルのロード？ (モジュール化？)
+
+email adress to profile... when a player registerd, send password or something to the address? (an option)
+
+Player Profile
+Registered Team (and enhancing regd nick)
+regdteam - そのチーム名をチームアップ可能か不可能かのオプション... そういう両者を含む方向で実装？
+change nick/team name in profile?
+profile - /who や chat の回数... もちろんランキング作成 :-)
+
+AnnounceStats - Send と SendToChannel を $sub に代入して &$sub，さらに $s or $ch を $sendto にいれておく
+
+
+report - trace only particular nick/host...
+trace... a part of report system
+各 Users のデータに TraceFlag みたいなの作る？ @Trace と... @Trace を変更したら各プレイヤーの TraceFlag も更新(再構築)？
+.ini に書くと permanent... /trace コマンドは temporary...
+
+[Report]
+
+Trace0=...
+
+
+
+
+
+tspec support
+irc support
+
+[Commands]
+/cmsg, /tmsg, /omsg (/report)
+MultipleNumeriousTarget() ? (/msg NUMS, /kick NUMS, /file filename NUMS)
+/msg ALL (/cmsg nick を作って) とか /file filename ALL (/broadcast は /msg ALL の alias) SendToAll=authority オプション？
+broadcast メッセージはメッセージの前に Broadcast message from %0 みたいに
+
+/msgto - および /topic - で消去？ (/topic - はすでにできるなぁ)
+
+/chstats (extended version of `/who ch'?)
+/who や /winlist などにも AnnounceStats や /list 系の整形アルゴリズムを？
+/who で WhoDisplayIP を満たさないとき ip(host) が () とだけ表示される＞現在
+/who, /who ch, /cwho?
+pack: /olist, /dns
+A.J: an indicator beside a person's name that shows if they are registered or not when you /who.
+
+/ignore, /silence, /ろっく
+/ghost
+
+/lmsg - 送れるメッセージ数の制限？
+/move 誰がコマンド発行したか
+
+[Things based on Nick with Password]
+rating system
+player profile: use_color_tag (convertion. ex. <blue> for blue code)
+
+[Checking (certifying/verifying)]
+
+TetriNET:
+  毎回チェック: s=0-2, l=0-3
+  総時間チェック: s=12-15, l=11-18
+
+TetriFAST:
+  毎回チェック: s=0-1, l=0-1
+  総時間チェック: s=1-3, l=1-5
+
+毎回チェックを一定秒数でクリアしたら途中で終わる？ or short (5 秒とか 10 秒くらい) と completely (死ぬまで) を用意？
+アイテムは毎回ランダムで 100% ?
+AllowUnverifyClientToConnect (not verified cannot play but can connect) - now just disconnects clients
+
+[Daily Stats]
+時間ごとのプレイヤー数
+その日もっともポイントを多く取った人
+勝率高い人？
+
+[Anti-Cheat]
+同 IP 警告？そのときゲームの得点は？
+Spoof special block message
+Impossible level update
+届いたデータの検証
+
+[Documentation]
+reference.html
+explanation of query (irc bots check)
+pts profile system (many names for a account tree; do not make alias loop)
+
+[ToDo2] (low priority or just thinking)
+password protected channel
+hidden channel (from /who or /list)
+game bot
+game recording/backplaying
+downstack.com 's /modes and /mode
+Score() は cache で以前参照したものは，あるていど覚えておく？
+cache of motd file (latest update time で判断？)
+over 6 players in a channel
+(現状維持) 一定時間 (30秒ていど？) 経っていないゲームもゲームとして認める
+
+[Data Structure]
+
+%Users
+  alive
+  antiflood
+  channel
+  checking # checking client on connecting
+  client
+  field
+  gs # game stats
+    csadded # classic style lines he/she added to
+    gamestate
+    last
+    lifetime
+    lines
+    pieces
+    prev
+    sbgiven # what sb were given to him/her
+    specials
+    tetris
+    ud # number of unsolved data
+  host
+  idletime
+  ip
+  msgto
+  nick
+  ping
+  playernum
+    pingbuf
+    pingmsg
+    slot
+    justconnected
+    sendplayerjoin
+  profile
+  recvbuf
+  sendbuf
+  slot
+  socket
+  team
+  timedout
+  timeout
+  timeoutingame
+  timeoutpinged
+  verified
+  version
+
+@Channels
+  announcescore
+  announcewinner
+  game # last/current game info
+    players
+    start # players at start
+    timeend
+    timestart
+    # and game settings
+  ingame
+  maxplayers
+  name
+  paused
+  persistant
+  players
+  playable
+  priority
+  reserved
+  sc # starting count
+  sd # sudden death
+  setable
+  tetrinet
+  tetrifast
+  topic
+  welcomemessage
+  winlist
+
+  gametype
+  stack
+  startinglevel
+  linesperlevel
+  levelincrease
+  linesperspecial
+  specialadded
+  specialcapacity
+  classicrules
+  averagelevels
+  sdtimeout
+  sdlinesperadd
+  sdsecsbetweenlines
+  sdmessage
+  blockleftl
+  blockleftz
+  blocksquare
+  blockrightl
+  blockrightz
+  blockhalfcross
+  blockline
+  specialaddline
+  specialclearline
+  specialnukefield
+  specialrandomclear
+  specialswitchfield
+  specialclearspecial
+  specialgravity
+  specialquakefield
+  specialblockbomb
+
+@Profiles
+  @type0 # player profile
+    name alias password authority team locale logins lastlogin onlinetime games
+#  @type1 # team profile
+#    name alias password
+
+%Misc
+  brokenpipe
+  clients
+  closing
+  commands
+  command_names
+  command_aliases
+  ip2host
+  lastcheck
+  listener
+  passwords
+  ptime
+  readable
+  shutdown
+  stacklevel
+  waitinglookup
+  writable
+
+@Winlist
+  %data
+    file
+    playeronly
+    type
+  @type1 # win points
+  @type2 # removed lines
+  @type3 # lifetime
+
+%daily
+  games # how many games ended
+  highestplayers # highest number of players
+  logins # how many players logged in
+  nowplayers # number of players
+
+
+BlockType, InsideExpression(Decimal), Designater(ASCII / Hex), AllBlocks(ASCII / Hex)
+
+  blank      0      ! / 21     0 / 30
+  block1     1      " / 22     1 / 31
+  block2     2      # / 23     2 / 32
+  block3     3      $ / 24     3 / 33
+  block4     4      % / 25     4 / 34
+  block5     5      & / 26     5 / 35
+  a          6      ' / 27     a / 61
+  c          7      ( / 28     c / 63
+  n          8      ) / 29     n / 6E
+  r          9      * / 2A     r / 72
+  s          10     + / 2B     s / 73
+  b          11     , / 2C     b / 62
+  g          12     - / 2D     g / 67
+  q          13     . / 2E     q / 71
+  o          14     / / 2F     o / 6F

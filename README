@@ -1,0 +1,64 @@
+Perl TetriNET Server - A TetriNET server written in Perl
+
+
+Features
+========
+
+* Written in Perl. You can run PTS on Windows/Unix/etc.
+* Supports multiple channels.
+* Supports TetriNET and TetriFAST clients. (no Tspec, no IRC)
+* Supports Query (IRC bot's check) access.
+* 10 level authority.
+* Game statistics.
+* User Profile with registered nick (no registered team yet).
+* Ping.
+* Async DNS lookup.
+* Anti flood.
+* Imperfect detection of cheat programs.
+
+
+Starting the server
+===================
+
+This is a shortly explanation. See docs/tutorial.html for more
+information.
+
+If you don't have a perl interpreter yet, install it first. You can
+download it from http://www.cpan.org/ports/ .
+
+Windows Users:
+
+Jusr unzip the archive and double-click the pts.pl icon (you must
+install perl interpreter before).
+
+UNIX Users:
+
+1. tar xzf pts-*.tar.gz
+2. cd pts-*
+3. ./pts.pl &
+
+If you want to run pts process as a daemon, set constant DAEMON (in the
+pts.pl) to 1 and type just `./pts.pl'.
+
+
+Author
+======
+
+Copyright 2001-2002 DEQ <deq@oct.zaq.ne.jp> All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License.
+
+PTS official information:
+http://ptns.sourceforge.net/
+http://www.necoware.com/~deq/tetrinet/pts/ (alternative)
+Forums, mailing lists, docs, etc.:
+http://sourceforge.net/projects/ptns/
+
+
+Contributors
+============
+
+Pihvi (The author of the Java TetriNET Server)
+NOiR and NiLS (downstack.com admin/programmer)
+Renegade (The author of the Renegade TetriNET Server)

@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Known Bugs</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Known Bugs</H1>
+
+<UL>
+  <LI>The server possibly miscounts number of dropped pieces / cleared lines.</LI>
+  <LI>Game-end announce (AnnounceScore) may lie about winlist rank
+  (If A who has rank 3 with 10 points and B who has rank 4 with 9 points are on same team,
+  they win a game and get 2 points, the following contradiction possible occurs:
+  First, B has now 11 points, then the server announces B is rank 3.
+  Second, A has now 12 points, then the server announces A is rank 3).</LI>
+</UL>
+
+<HR>
+
+<ADDRESS>Copyleft 2001-2002 DEQ &lt;<A href="mailto:deq@oct.zaq.ne.jp">deq@oct.zaq.ne.jp</A>&gt;</ADDRESS>
+
+</BODY>
+</HTML>

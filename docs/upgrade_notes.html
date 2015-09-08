@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Upgrade Notes</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Upgrade Notes</H1>
+
+<H2>Upgrading v0.19 to v0.20</H2>
+<P>Added ability to detect cheat programs such as TClone.
+If you turn on VerifyClient, there will be a verification test for every client on connecting.
+I have not tested GTetrinet client yet, so if that client cannot connect this server, please let me know.</P>
+<P>The shebang line is now set to #!/usr/local/bin/perl as opposed to #!/usr/bin/perl.</P>
+<P>Japanese system message file is no longer loaded in default.</P>
+<P>Banning of nickname now bans his/her profile nickname,
+not his/her real nickname which is visible for players.
+Remember this if you are using profile and ban functions.</P>
+
+<H2>Upgrading v0.18 to v0.19</H2>
+<P>Added Report system, which consists of two part.
+The one is existing logging system,
+and the other one is reporting online players with a certain authority.
+Related to the feature, [Log] section has been renamed to [Report],
+and the members' value format also changed.
+Additionally, some logging (now known as report) messages have been changed.</P>
+<P>Added [Main] ReservedName to config file. Users cannot use the names for their nickname.</P>
+<P>Changed form of Format* messages and added SendCommandFormat().
+If you changed `en.msg' and/or added a your own command, take care of it.</P>
+
+<H2>Upgrading v0.17 to v0.18</H2>
+<P>Added `locale' directly.
+`msg.en' file has been moved there as `en.msg'.</P>
+<P>Added [Locale] section to config file.
+On the other hand, MSGFILE option has been removed from `pts.pl' file.</P>
+<P>Code related to Send() and Msg() has been changed.
+If you have your own code, please notice what has been changed.
+Copying old code may work correctly, but sometimes will not.</P>
+<P>[Command] WhoDisplayIP option (in the `pts.ini' file) has been renamed to DisplayIP.</P>
+<P>Added [Main] AntiFlood, MessagePenalty and PenaltyPerSecond options to config file.
+Removed ANTIFLOOD, MESSAGEPENALTY and PENALTYPERSECOND options from pts.pl file.
+Yes, they are just moved.</P>
+
+<H2>Upgrading v0.16 to v0.17</H2>
+<P>Now secure file (pts.secure) has a section name [Secure] as the first line.
+And message file (msg.en) has [Messages].
+Make sure that the 2 lines are added to your files.</P>
+
+<H2>Upgrading v0.15 to v0.16</H2>
+<P>A file called pts.lmsg has been added with /board and /lmsg commands.</P>
+<P>Added [Channel*] GameStatsMsg option to config file.</P>
+
+<H2>Upgrading v0.14 to v0.15</H2>
+<P>You must rewrite pts.ini and pts.secure.
+The authority system had changed to 10 levels from 3 levels.
+In default, the op (/auth op) is associated to level 5,
+the admin (/auth admin), called owner before, is associated to level 9.
+Users are 0, and mederators (players who are on slot 1) are 1.</P>
+
+<H2>Upgrading v0.12 to v0.13</H2>
+<P>If you want to use pts on unix, you can set DAEMON to 1.
+Then type just `pts.pl' to start the server instead of typing `pts.pl &'.</P>
+<P>Added TIMEHIRES option that gets millisecond resolution time.
+If you want to use the feature:</P>
+<DL>
+<DT>Unix users:</DT>
+  <DD><P>Download the <A href="http://search.cpan.org/search?dist=Time-HiRes">Time::HiRes</A> perl module and install it.
+  You may need root to install it, or you may be able to install it under your home directory as a user.</P></DD>
+<DT>MS-Windows users:</DT>
+  <DD><P>If you are using ActivePerl, open MS-DOS prompt and type `ppm install Time::HiRes'.</P></DD>
+</DL>
+
+<H2>Upgrading v0.11 to v0.12</H2>
+<P>Ban file format has been changed.</P>
+
+<H2>Upgrading v0.10 to v0.11</H2>
+<P>v0.11 does not need Games/Tetrinet.pm file.</P>
+<P>Constant MOTDFILE which was defined in pts.pl is now written in pts.ini.
+And some options in pts.ini are appended/renamed, so take a look at Changes.</P>
+
+<HR>
+
+<ADDRESS>Copyleft 2001-2002 DEQ&lt;<A href="mailto:deq@oct.zaq.ne.jp">deq@oct.zaq.ne.jp</A>&gt;</ADDRESS>
+
+</BODY>
+</HTML>

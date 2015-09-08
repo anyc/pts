@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Tutorial</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Tutorial</H1>
+
+<P>Tutorial for Perl TetriNET Server (pts) v0.20.</P>
+
+<UL>
+<LI><A href="#installation">Installation</A></LI>
+<LI><A href="#test_run">Test Run</A></LI>
+<LI><A href="#basic_configuration">Basic Configuration</A></LI>
+
+</UL>
+
+<HR>
+
+<H2><A name="installation">Installation</A></H2>
+
+<H3>MS-Windows</H3>
+
+<P>pts requires perl 5.005 or later.
+If you have not installed a perl interpreter yet,
+<A href="http://www.cpan.org/ports/">install perl</A> first (<A href="http://www.activestate.com/">ActivePerl</A> is recommended).</P>
+
+<P>Download a pts distribution from <A href="http://sourceforge.net/project/showfiles.php?group_id=46493">SourceForge</A> or <A href="http://www.necoware.com/~deq/tetrinet/files/server/">www.necoware.com</A>,
+and unpacks it (with <A href="http://www.winzip.com/">WinZip</A> or whatever).
+.zip archives are for MS-Windows, using CRLF as a line ending.</P>
+
+<H3>UNIX</H3>
+
+<P>pts requires perl 5.005 or later.
+Most UNIX users would already have it, but if your system have not installed it yet,
+<A href="http://www.cpan.org/ports/">install perl</A> first.</P>
+
+<P>Download a pts distribution from <A href="http://sourceforge.net/project/showfiles.php?group_id=46493">SourceForge</A> or <A href="http://www.necoware.com/~deq/tetrinet/files/server/">www.necoware.com</A>,
+and unpacks it (with `tar xzf pts-*.tar.gz').
+.tar.gz archives are for UNIX, using LF as a line ending.</P>
+
+<H2><A name="test_run">Test Run</A></H2>
+
+<P>When you run pts at first time,
+some errors that some important files cannot be opened will be logged,
+though it's OK, the files will be created when you shut down the server properly.</P>
+
+<H3>MS-Windows</H3>
+
+<P>Double click on pts.pl, then MS-DOS prompt (or command prompt) will open
+and starting messages will be shown.
+Connect your own server with a tetrinet (or tetrifast) client
+and make sure the server is correctly running.</P>
+
+<P>In the default setting, you don't have proper way to shut down the server,
+so that you need to kill the pts process forcibly.
+Activate the MS-DOS prompt and hit Ctrl+C,
+then the MS-DOS prompt will close and also the running pts process will be killed.
+Note that this way will not save current data to file.</P>
+
+<H3>UNIX</H3>
+
+<P>cd to pts directory and type `./pts.pl &', then pts launches
+and starting messages will be shown.
+Connect your own server with a tetrinet (or tetrifast) client
+and make sure the server is correctly running.</P>
+
+<P>In the default setting, you don't have proper way to shut down the server,
+so that you need to kill the pts process forcibly.
+Show pts's pid with `cat pts.pid' and kill the pts process with `kill -INT pid'
+(pid is a number what you showed just before).</P>
+
+<H2><A name="basic_configuration">Basic Configuration</A></H2>
+
+<H3>Main program (pts.pl)</H3>
+
+<P>Open pts.pl with a text editor, so you will see there are some constants in the top part of the program.
+You'd like to leave most settings as default,
+but some settings are noticeable:</P>
+
+<DL>
+<DT>DAEMON</DT>
+  <DD><P>If you set this to 1, pts runs as a daemon process
+  (so that you can launch pts.pl as just `./pts.pl', no & required in the end).
+  This needs fork() and setsid() are available.
+  This won't work on MS-Windows.</P></DD>
+<DT>NOFORK</DT>
+  <DD><P>If you set this to 1, pts will not fork() in the process of looking up host name (See below).
+  If your OS or perl doesn't support fork(), you should set this on.</P></DD>
+<DT>TIMEHIRES</DT>
+  <DD><P>If you set this to 1, pts can get millisecond resolution time.
+  This effects ping time and total time of game
+  (perl only can count seconds, not milliseconds, in the default).</P>
+  <P>You will need to install Time::HiRes perl module manually.
+  If you are using ActivePerl on MS-Windows, open MS-DOS prompt and type `ppm install Time::HiRes'.
+  It will install the module automatically.
+  If you are on UNIX, get <A href="http://search.cpan.org/search?dist=Time-HiRes">the source from CPAN</A> and install it.</P></DD>
+<DT>LOOKUPHOST</DT>
+  <DD><P>If you set this to 1, pts will lookup user's host name when user connected
+  (host name is readable name like `yahoo.com' as opposed to IP adreess like `216.115.109.6').</P>
+  <P>If your system has fork(), you can async DNS lookup
+  (Don't know what it is? Don't worry about it, it's good thing anyway).
+  If fork() is unavailable, you cannot async DNS lookup,
+  so that if a user connects the server, pts process will stop some seconds.
+  (Not exactly, but it seems stopped for players in the server.
+  They will not get any response from the server during the time).
+  The `some seconds' is actually 0.1 seconds or less for most cases,
+  but sometimes it takes 10 seconds or 3 minutes,
+  depending on the network and the connecting user.
+  If your system doesn't support fork() but you want to avoid the stop time, turn this option off.</P>
+  </DD>
+
+</DL>
+
+<H3>Config file (pts.ini)</H3>
+
+<P>The pts.ini file is main config file.
+Edit it for what you want.</P>
+
+<H3>Secure file (pts.secure)</H3>
+
+<P>The pts.secure file contains op/admin passwords.
+In default, op (you can get op authority with /op pass) password is `Password5'
+and admin (you can get admin authority with /admin pass) password is `Password9'.
+You can write passwords as a plain text (not encrypted word).</P>
+
+<P>If you want write encrypted passwords for pts.secure, use util/encrypt.pl program.
+It returns encrypted string.
+Write the returned value to the Password* field, and set Crypted to 1.</P>
+
+<P>Admin password should be set,
+because /shutdown (this should be used only by admins) is the proper way to shut down the server.</P>
+
+<H3>Massage of the Day (pts.motd)</H3>
+
+<P>Massage of the Day (motd) is the message shown when you have connected.
+You can use these color tags in the message:
+&lt;black&gt; &lt;gray&gt; &lt;lgray&gt; &lt;dblue&gt; &lt;blue&gt; &lt;lblue&gt;
+&lt;dgreen&gt; &lt;lgreen&gt; &lt;teal&gt; &lt;rust&gt; &lt;red&gt; &lt;pink&gt;
+&lt;purple&gt; &lt;yellow&gt; &lt;white&gt; &lt;bold&gt; &lt;italic&gt; &lt;underline&gt;</P>
+
+<HR>
+
+<ADDRESS>Copyleft 2001-2002 DEQ &lt;<A href="mailto:deq@oct.zaq.ne.jp">deq@oct.zaq.ne.jp</A>&gt;</ADDRESS>
+
+</BODY>
+</HTML>

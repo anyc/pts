@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Frequently Asked Questions (FAQ)</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Frequently Asked Questions (FAQ)</H1>
+
+<UL>
+<LI><A href="#server_went_down_with_error_io_select">Server went down with error `Can't use an undefined value as a symbol reference at /usr/lib/perl5/5.00503/i386-linux/IO/Select.pm line 204.'</A></LI>
+<LI><A href="#how_to_change_the_points_players_get">How to change the points players get?</A></LI>
+<LI><A href="#how_to_add_a_new_command">How to add a new command?</A></LI>
+
+</UL>
+
+<H2><A name="server_went_down_with_error_io_select">Server went down with error `Can't use an undefined value as a symbol reference at /usr/lib/perl5/5.00503/i386-linux/IO/Select.pm line 204.'</A></H2>
+
+<P>Install 1.14 or later version of IO::Select perl module.</P>
+
+<H2><A name="how_to_change_the_points_players_get">How to change the points players get?</A></H2>
+
+<P>Points are calculated at WinlistCalculate() function in the pts.pl.
+Especially the following lines calculate the normal game's points:</P>
+
+<PRE>
+    my $winners = scalar @{$rank[0]}; # the number of winner players
+    my $starters = scalar @{$ch->{game}{start}}; # the number of started players
+    my $points = round(($starters / $winners) * 0.5, SCOREDECIMAL);
+</PRE>
+
+<H2><A name="how_to_add_a_new_command">How to add a new command?</A></H2>
+
+<P>For example, if you want a command `/features' that displays `features.txt',</P>
+
+<OL>
+<LI>In all files in the locale directory, add the following two lines:
+<PRE>FormatFeatures=%0%1
+ExplainFeatures=Displays features</PRE>
+</LI>
+<LI>In `pts.ini', add the following two options:
+`[Command] Features=1' and `[FilePath] features=features.txt'.</LI>
+<LI>In `pts.pl', at first add a line
+<PRE>    features => \&OnPlFeatures,</PRE>
+in PlCommands() function.
+Secondly, add a function OnPlFeatures():
+<PRE>sub OnPlFeatures {
+  my ($s, $msg, $page) = @_;
+  my ($cmd) = split(/ +/, $msg, 2);
+
+  SendFromFile($s, 'features');
+}</PRE>
+</LI>
+
+</OL>
+
+<P>That's all.</P>
+
+<HR>
+
+<ADDRESS>Copyleft 2001-2002 DEQ &lt;<A href="mailto:deq@oct.zaq.ne.jp">deq@oct.zaq.ne.jp</A>&gt;</ADDRESS>
+
+</BODY>
+</HTML>

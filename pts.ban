@@ -1,0 +1,9 @@
+# You can specify pairs of nickname and IP address (or host name) masks for ban.
+# The format is: -options nick host
+# options: e = exception, r = regular expression (case-insensitive)
+# Wildcards `?' and `*' are available.
+# To edit expire date which follows a mask is not recommended.
+# Any texts after `#' are ignored as comments.
+
+# Example:
+# - * 218.220.24.*    # all users from 218.220.24.*
