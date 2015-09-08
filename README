@@ -1,5 +1,6 @@
 Perl TetriNET Server - A TetriNET server written in Perl
 
+This repo contains a mod of the original PTS from http://sourceforge.net/projects/ptns/
 
 Features
 ========
@@ -16,6 +17,9 @@ Features
 * Anti flood.
 * Imperfect detection of cheat programs.
 
+Inofficial features added with mod_anyc:
+* Tetrinet protocol 1.14 support
+* Prefill board with custom blocks
 
 Starting the server
 ===================
